@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
@@ -121,6 +122,13 @@ func executeSchedules(clients api_gateway.Clients, logger log.Logger) {
 	}
 }
 
+func wakeupServer() {
+	for {
+		time.Sleep(60 * time.Second)
+		http.Get("https://duck-feed-api.herokuapp.com/reports/")
+	}
+}
+
 func main() {
 	logger := logger_builder.NewLogger("api-gateway")
 	setupRollbar()
@@ -136,6 +144,7 @@ func main() {
 		rollbar.Wait()
 	}()
 	go executeSchedules(clients, logger)
+	go wakeupServer()
 
 	// Wait for interrupt signal to gracefully shutdown the server with
 	// a timeout of 5 seconds, any request that lasts more than that
