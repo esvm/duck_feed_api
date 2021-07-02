@@ -1,0 +1,17 @@
+on:
+  push:
+    branches: [main]
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Docker base
+        run: make pipeline/docker/base
+      - name: Lint
+        run: make pipeline/lint
+      - name: Test
+        run: |
+          export $(grep -v '^#' .env | xargs)
+          make pipeline/test
