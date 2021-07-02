@@ -1,0 +1,35 @@
+version: "3.5"
+services:
+  db:
+    image: postgres
+    container_name: duck-feeds_db
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DATABASE=database
+    volumes:
+      - ./src/duck_feeds_service/store/postgres/schema.sql:/src/duck_feeds_service/store/postgres/schema.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - api-network
+
+  duck_feed_api:
+    image: duck_feed_api
+    build: .
+    ports:
+      - "80:80"
+    depends_on:
+      - "db"
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgres://user:password@duck-feeds_db:5432/duck_feeds?sslmode=disable
+    networks:
+      - api-network
+    ports:
+      - 80:80
+
+networks:
+  api-network:
+    driver: bridge
