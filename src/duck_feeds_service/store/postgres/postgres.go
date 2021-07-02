@@ -97,10 +97,8 @@ func (d duckFeedDatabase) GetDuckFeedReportById(id int) (*duck_feed.DuckFeed, er
 		return nil, errors.Wrap(err, "Failed to connect with database")
 	}
 
-	duckFeed := &duck_feed.DuckFeed{
-		ID: id,
-	}
-	if err := db.Model(duckFeed).Select(); err != nil {
+	duckFeed := &duck_feed.DuckFeed{}
+	if err := db.Model(duckFeed).Where("id = ?", id).Select(); err != nil {
 		if err == pg.ErrNoRows {
 			return nil, nil
 		}
